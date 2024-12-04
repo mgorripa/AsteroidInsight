@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link href="{% static 'css/solar_distance.css' %}" rel="stylesheet" type="text/css">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Loader");
+        init();
+    });
+
+    function init() {
+        var input_form_type = '{{mode}}';
+        if (input_form_type !== "csv") {
+            document.getElementById('full-export-button').hidden = true;
+        }
+    }
+
+    function goBack() {
+        window.location.href = '{% url "Solar_Distance:solar_distance" %}';
+        return;
+    }
+
+    function exportToCSV(type) {
+        var columns;
+        var data;
+        if (type == 'reduced') {
+            columns = {{columns | safe}};
+            data = {{ data | safe }};
+        } else {
+            columns = {{ all_columns | safe}};
+            data = {{ all_data | safe }};
+        }
+
+        // Create CSV content
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += columns.join(',') + '\n'; // Add column headers
+        data.forEach(function(row) {
+            csvContent += row.join(',') + '\n'; // Add each row
+        });
+
+        // Create a link element to trigger the download
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "data.csv");
+        document.body.appendChild(link); // Required for Firefox
+        link.click(); // Trigger the download
+    }
+</script>
+{% endblock head %}
+
+
+{% block content %}
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Predict the position of asteroids where they are nearest and the farthest away from the sun </h1>
+        <p>Asteroids are classified based on the values of their perihelion and aphelion points. Below is the graph showing the classification classes based on their aphelion and perihelion point</p>
+        <img class="ui left floated large image" src="{% static 'images/output.png' %}" alt="classification graph">
+        <p class="spacing"><br></p>
+        <p class="perihelion"><strong>Perihelion</strong> This refers to the point in an asteroid's orbit around the Sun where it is closest to the Sun. At perihelion, 
+            the asteroid is traveling at its highest velocity due to the gravitational pull of the Sun, and it experiences its highest 
+            temperature because of the proximity to the Sun's radiation. </p>
+        <p class="aphelion"><strong>Aphelion</strong> This refers to the point in an asteroid's orbit around the Sun where it is farthest from the Sun. At 
+            aphelion, the asteroid is traveling at its slowest velocity in its orbit, and it experiences its lowest temperature 
+            because of the distance from the Sun. </p>
+        <p class="asteroids">For many asteroids, their orbits are elliptical, meaning they are not perfect circles but rather elongated shapes. 
+            Therefore, the distance between the asteroid and the Sun varies throughout its orbit, and perihelion and aphelion 
+            represent the extremes of this distance.</p>
+        <p class="spacing"><br></p>
+        <p class="calculate">To calculate the perihelion and aphelion points of an asteroid's orbit, you need to know some key parameters of 
+            its orbit. These parameters include: </p>
+        <p class="a"><strong>Semi-major axis (a)</strong>: This is one-half of the longest diameter of the elliptical orbit. It represents the average 
+            distance between the asteroid and the Sun.</p>
+        <p class="e"><strong>Eccentricity (e)</strong>: This parameter describes how elongated the orbit is. It is a number between 0 and 1, where 0 
+            represents a circular orbit and 1 represents a highly elongated orbit. </p>
+        <p class="parameters">With these parameters, you can use the following formulas: </p>
+        <p class="formula">&emsp; 1. <strong>Perihelion distance (q)</strong>: q = a × (1 − e)</p>
+        <p class="formula">&emsp; 2. <strong>Aphelion distance (Q)</strong>: Q = a × (1 + e)</p>
+        <br />
+        <p>Below, you can fill in the perihelion and aphelion points, or put in your dataset and get the classification of the asteroid/s</p>
+    </div>
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Output Data</h1>
+        <form method="get">
+            <div class="col-12 scrollable">
+                <table class="ui table celled">
+                    <thead>
+                        <tr>
+                            <!-- Render table headers dynamically -->
+                            {% for column in columns %}
+                            <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            {% for column in row %}
+                                <td>{{ column }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <br />
+        </form>
+        <button class="btn btn-primary" type="submit" onclick="goBack()">Go back to Input</button>
+        <button class="btn btn-primary" onclick="exportToCSV('reduced')">Export Reduced Table</button>
+        <button id="full-export-button" class="btn btn-primary" onclick="exportToCSV('full')">Export Whole Table</button>
+    </div>
+{% endblock content%}

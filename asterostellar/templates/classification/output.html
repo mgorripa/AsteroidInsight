@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link href="{% static 'css/classification.css' %}" rel="stylesheet" type="text/css">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Loader");
+        init();
+    });
+
+    function init() {
+        var input_form_type = '{{mode}}';
+        if (input_form_type !== "csv") {
+            document.getElementById('full-export-button').hidden = true;
+        }
+    }
+
+    function goBack() {
+        window.location.href = '{% url "Classification:classification" %}';
+        return;
+    }
+
+    function exportToCSV(type) {
+        var columns;
+        var data;
+        if (type == 'reduced') {
+            columns = {{columns | safe}};
+            data = {{ data | safe }};
+        } else {
+            columns = {{ all_columns | safe}};
+            data = {{ all_data | safe }};
+        }
+
+        // Create CSV content
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += columns.join(',') + '\n'; // Add column headers
+        data.forEach(function(row) {
+            csvContent += row.join(',') + '\n'; // Add each row
+        });
+
+        // Create a link element to trigger the download
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "data.csv");
+        document.body.appendChild(link); // Required for Firefox
+        link.click(); // Trigger the download
+    }
+</script>
+{% endblock head %}
+
+
+{% block content %}
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Classification of Asteroids</h1>
+        <p>Asteroids are classified based on the values of their perihelion and aphelion points. Below is the graph showing the classification classes based on their aphelion and perihelion point</p>
+        <img class="ui left floated big image" src="{% static 'images/classification.png' %}" alt="classification graph">
+        <p class="amo">AMO : Near-Earth asteroids predominantly outside Earth's orbit</p>
+        <p class="mba">MBA : Rocky objects located within the asteroid belt between Mars and Jupiter, providing insights into solar system formation and potential Earth impact threats.</p>
+        <p class="mca">MCA : A class of asteroids whose orbits intersect with that of Mars, potentially posing a risk of collision with the planet.</p>
+        <p class="apo">APO : Earth-crossing asteroids, mostly beyond Earth's orbit</p>
+        <p class="imb">IMB : Located within the asteroid belt between the orbits of Mars and Jupiter</p>
+        <p class="omb">OMB : Rocky bodies located in the outer region of the asteroid belt between the orbits of Mars and Jupiter</p>
+        <p class="tjn">TJN : Reside in Jupiter's orbit, positioned at the L4 or L5 Lagrange Points</p>
+        <p class="cen">CEN : Small solar system bodies between Jupiter and Neptune</p>
+        <p class="ast">AST : Other asteroids</p>
+        <br />
+        
+    </div>
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Output Data</h1>
+        <form method="get">
+            <div class="col-12 scrollable">
+                <table class="ui table celled">
+                    <thead>
+                        <tr>
+                            <!-- Render table headers dynamically -->
+                            {% for column in columns %}
+                            <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            {% for column in row %}
+                                <td>{{ column }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <br />
+        </form>
+        <button class="btn btn-primary" type="submit" onclick="goBack()">Go back to Input</button>
+        <button class="btn btn-primary" onclick="exportToCSV('reduced')">Export Reduced Table</button>
+        <button id="full-export-button" class="btn btn-primary" onclick="exportToCSV('full')">Export Whole Table</button>
+    </div>
+{% endblock content%}

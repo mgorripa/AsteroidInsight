@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link href="{% static 'css/pha.css' %}" rel="stylesheet" type="text/css">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Loader");
+        init();
+    });
+
+    function init() {
+        var input_form_type = '{{mode}}';
+        if (input_form_type !== "csv") {
+            document.getElementById('full-export-button').hidden = true;
+        }
+    }
+    
+    function goBack() {
+        window.location.href = '{% url "PHA:pha" %}';
+        return;
+    }
+
+    function exportToCSV(type) {
+        var columns;
+        var data;
+        if (type == 'reduced') {
+            columns = {{columns | safe}};
+            data = {{ data | safe }};
+        } else {
+            columns = {{ all_columns | safe}};
+            data = {{ all_data | safe }};
+        }
+
+        // Create CSV content
+        var csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += columns.join(',') + '\n'; // Add column headers
+        data.forEach(function(row) {
+            csvContent += row.join(',') + '\n'; // Add each row
+        });
+
+        // Create a link element to trigger the download
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "data.csv");
+        document.body.appendChild(link); // Required for Firefox
+        link.click(); // Trigger the download
+    }
+</script>
+{% endblock head %}
+
+
+{% block content %}
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Asteroid Hazard Prediction Results</h1>
+        <p>Asteroids are classified based on the values of their perihelion and aphelion points. Below is the graph showing the classification classes based on their aphelion and perihelion point</p>
+        <img class="ui left floated large image" src="{% static 'images/result.png' %}" alt="classification graph">
+        <p>In conclusion, our study highlights the inherent hazards posed by asteroids as they traverse through our solar system. From their eccentric orbits to their varying sizes and compositions, asteroids present a complex and dynamic landscape of potential threats to our planet Earth. Through rigorous analysis of orbital dynamics and predictive modeling, we have gained valuable insights into the factors that contribute to asteroid hazards</p>
+        <br />
+        <p>Asteroids, both large and small, have the potential to impact Earth with devastating consequences. The kinetic energy unleashed upon impact can lead to widespread destruction, including tsunamis, wildfires, and climatic changes. Moreover, the threat of an asteroid impact underscores the importance of ongoing monitoring and mitigation efforts to safeguard humanity and our environment.</p>
+        <br />
+        <p>As we continue to explore the cosmos and expand our understanding of asteroid hazards, collaboration among scientists, policymakers, and the public remains paramount. By raising awareness, developing advanced detection technologies, and implementing proactive strategies, we can mitigate the risks posed by potentially hazardous asteroids and ensure the long-term resilience of our planet and civilization.</p>
+        <br />
+        <br />
+    </div>
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Output Data</h1>
+        <form method="get">
+            <div class="col-12 scrollable">
+                <table class="ui table celled">
+                    <thead>
+                        <tr>
+                            <!-- Render table headers dynamically -->
+                            {% for column in columns %}
+                            <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            {% for column in row %}
+                                <td>{{ column }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <br />
+        </form>
+        <button class="btn btn-primary" type="submit" onclick="goBack()">Go back to Input</button>
+        <button class="btn btn-primary" onclick="exportToCSV('reduced')">Export Reduced Table</button>
+        <button id="full-export-button" class="btn btn-primary" onclick="exportToCSV('full')">Export Whole Table</button>
+    </div>
+{% endblock content%}

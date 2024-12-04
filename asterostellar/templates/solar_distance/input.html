@@ -1,0 +1,207 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link href="{% static 'css/solar_distance.css' %}"  rel="stylesheet" type="text/css">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+    function init() {
+        document.getElementById('csv-checkbox').checked = true;
+        document.getElementById('dataset_file').value = "";
+        document.getElementById('semi_major_axis').value = "";
+        document.getElementById('eccentricity').value = "";
+    }
+    
+    function validateDatasetFile() {
+        var fileInput = document.getElementById('dataset_file');
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.xls|\.xlsx|\.csv)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('file_type_error').classList.add('unhide_div');
+            document.getElementById('file_type_validated').classList.remove('unhide_div');
+            fileInput.value = '';
+            return false;
+        } else {
+            document.getElementById('file_type_error').classList.remove('unhide_div');
+            document.getElementById('file_type_validated').classList.add('unhide_div');
+            return true;
+        }
+    }
+
+    function validateSemiMajorAxis() {
+        semi_major_axis = document.getElementById('semi_major_axis');
+        if (!isNaN(semi_major_axis.value)) {
+            document.getElementById('semi_major_axis_error').classList.remove('unhide_div');
+            document.getElementById('semi_major_axis_validated').classList.add('unhide_div');
+            return true;
+        } else {
+            document.getElementById('semi_major_axis_error').classList.add('unhide_div');
+            document.getElementById('semi_major_axis_validated').classList.remove('unhide_div');
+            return false;
+        }
+    }
+
+    function validateEccentricity() {
+        eccentricity = document.getElementById('eccentricity');
+        if (!isNaN(eccentricity.value)) {
+            document.getElementById('eccentricity_error').classList.remove('unhide_div');
+            document.getElementById('eccentricity_validated').classList.add('unhide_div');
+            return true;
+        } else {
+            document.getElementById('eccentricity_error').classList.add('unhide_div');
+            document.getElementById('eccentricity_validated').classList.remove('unhide_div');
+            return false;
+        }
+    }
+
+    function submitDatasetForm() {
+        if (validateDatasetFile()) {
+            document.getElementById('input-form').classList.add('hide_div');
+            document.getElementById("loader").classList.remove('hide_div');
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function submitSingleForm() {
+        if (validateSemiMajorAxis() && validateEccentricity()) {
+            document.getElementById('input-form').classList.add('hide_div');
+            document.getElementById("loader").classList.remove('hide_div');
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function changeForm(src) {
+        if (src.value == "csv") {
+            document.getElementById('input-csv-form').classList.remove('hide_div');
+            document.getElementById('input-single-form').classList.add('hide_div');
+        } else {
+            document.getElementById('input-csv-form').classList.add('hide_div');
+            document.getElementById('input-single-form').classList.remove('hide_div');
+        }
+    }
+</script>
+{% endblock head %}
+
+
+{% block content %}
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Predict the position of asteroids where they are nearest and the farthest away from the sun </h1>
+        
+        <p>Perihelion and aphelion are terms used in astronomy to describe the points in an orbit around the Sun where an 
+            object, such as an asteroid, is closest to and farthest from the Sun, respectively. </p>
+        <img class="ui left floated big image" src="{% static 'images/asteroid_perihelion.jpeg' %}" alt="classification graph">
+        <p class="spacing"><br></p>
+        <p class="perihelion"><strong>Perihelion</strong> This refers to the point in an asteroid's orbit around the Sun where it is closest to the Sun. At perihelion, 
+            the asteroid is traveling at its highest velocity due to the gravitational pull of the Sun, and it experiences its highest 
+            temperature because of the proximity to the Sun's radiation. </p>
+        <p class="aphelion"><strong>Aphelion</strong> This refers to the point in an asteroid's orbit around the Sun where it is farthest from the Sun. At 
+            aphelion, the asteroid is traveling at its slowest velocity in its orbit, and it experiences its lowest temperature 
+            because of the distance from the Sun. </p>
+        <p class="asteroids">For many asteroids, their orbits are elliptical, meaning they are not perfect circles but rather elongated shapes. 
+            Therefore, the distance between the asteroid and the Sun varies throughout its orbit, and perihelion and aphelion 
+            represent the extremes of this distance.</p>
+        <p class="spacing"><br></p>
+        <p class="calculate">To calculate the perihelion and aphelion points of an asteroid's orbit, you need to know some key parameters of 
+            its orbit. These parameters include: </p>
+        <p class="a"><strong>Semi-major axis (a)</strong>: This is one-half of the longest diameter of the elliptical orbit. It represents the average 
+            distance between the asteroid and the Sun.</p>
+        <p class="e"><strong>Eccentricity (e)</strong>: This parameter describes how elongated the orbit is. It is a number between 0 and 1, where 0 
+            represents a circular orbit and 1 represents a highly elongated orbit. </p>
+        <p class="parameters">With these parameters, you can use the following formulas: </p>
+        <p class="formula">&emsp; 1. <strong>Perihelion distance (q)</strong>: q = a × (1 − e)</p>
+        <p class="formula">&emsp; 2. <strong>Aphelion distance (Q)</strong>: Q = a × (1 + e)</p>
+
+    </div>
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Input Data</h1>
+        <div id="loader" class="d-flex justify-content-center hide_div">
+            <div class="spinner-grow text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-secondary" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-danger" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-warning" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-info" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-light" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-dark" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div id="input-form">
+            <div class="d-flex justify-content-center">
+                <div class="form-check form-check-inline input-selecters">
+                    <input id="csv-checkbox" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="csv" checked onchange="changeForm(this)">
+                    <label class="form-check-label" for="inlineRadio1">Input a csv file</label>
+                </div>
+                <div class="form-check form-check-inline input-selecters">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="single" onchange="changeForm(this)">
+                    <label class="form-check-label" for="inlineRadio2">Input values individually</label>
+                </div>
+            </div>
+            <br />
+            <form id="input-csv-form" class="needs-validation input" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input class="form-control form-control-sm" id="form_type" name="form_type" type="text" value="csv" hidden>
+                    <label for="dataset_file" class="form-label">Upload File</label>
+                    <input class="form-control form-control-sm" id="dataset_file" name="dataset_file" type="file" onchange="validateDatasetFile()" value="">
+                    <div id="file_type_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="file_type_error" class="invalid-feedback" >
+                        **Must be an excel file
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="" onclick="return submitDatasetForm()">Submit form</button>
+                </div>
+            </form>
+            <form id="input-single-form" class="needs-validation input hide_div" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input class="form-control form-control-sm" id="form_type" name="form_type" type="text" value="single" hidden>
+                    <label for="semi_major_axis" class="form-label">Semi Major Axis</label>
+                    <input class="form-control form-control-sm" id="semi_major_axis" name="semi_major_axis" type="text" value="" required onchange="validateSemiMajorAxis()">
+                    <div id="semi_major_axis_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="semi_major_axis_error" class="invalid-feedback" >
+                        Wrong Input
+                    </div>
+                    <br />
+                    <label for="eccentricity" class="form-label">Eccentricity</label>
+                    <input class="form-control form-control-sm" id="eccentricity" name="eccentricity" type="text" value="" required onchange="validateEccentricity()">
+                    <div id="eccentricity_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="eccentricity_error" class="invalid-feedback" >
+                        Wrong Input
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="" onclick="return submitSingleForm()">Submit form</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content%}

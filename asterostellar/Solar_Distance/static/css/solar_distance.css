@@ -1,0 +1,82 @@
+body {
+    background-image: url("../images/asteroids4.jpg");
+}
+
+.description {
+    margin: 2rem !important;
+    background-color: #12151c !important;
+}
+
+.description h1,p {
+    color: white !important;
+}
+
+.amo {
+    color: royalblue !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+
+.mba {
+    color: darkorange !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+
+.mca {
+    color: forestgreen !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+
+.apo {
+    color: red !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+
+.imb {
+    color: mediumorchid !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+
+.omb {
+    color: saddlebrown !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+
+.tjn {
+    color: violet !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+.ast {
+    color: gray !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+.cen {
+    color: darkkhaki !important;
+    margin: -0.5rem 0 1rem 0 !important;
+}
+
+.input label {
+    color: white !important;
+}
+
+.unhide_div {
+    display: block !important;
+}
+
+.hide_div {
+    display: none !important;
+}
+
+.OR {
+    color: white !important;
+}
+
+.input-selecters {
+    color: white !important;   
+}
+
+.scrollable {
+    max-height: 300px; /* Adjust the maximum height as needed */
+    max-width: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+}

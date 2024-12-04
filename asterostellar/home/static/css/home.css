@@ -1,0 +1,12 @@
+body {
+    background-image: url("../images/asteroids.jpg");
+}
+
+.astrostellar {
+    margin: 2rem !important;
+    background-color: #12151c !important;
+}
+
+.astrostellar h1, h2, p, h3 {
+    color: white !important;
+}

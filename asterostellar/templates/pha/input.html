@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link href="{% static 'css/pha.css' %}" rel="stylesheet" type="text/css">
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+    });
+    function init() {
+        document.getElementById('csv-checkbox').checked = true;
+        document.getElementById('dataset_file').value = "";
+        document.getElementById('mean_motion').value = "";
+        document.getElementById('perihelion_point').value = "";
+        document.getElementById('semi_major_axis').value = "";
+        document.getElementById('absolute_magnitude').value = "";
+    }
+    
+    function validateDatasetFile() {
+        var fileInput = document.getElementById('dataset_file');
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.xls|\.xlsx|\.csv)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('file_type_error').classList.add('unhide_div');
+            document.getElementById('file_type_validated').classList.remove('unhide_div');
+            fileInput.value = '';
+            return false;
+        } else {
+            document.getElementById('file_type_error').classList.remove('unhide_div');
+            document.getElementById('file_type_validated').classList.add('unhide_div');
+            return true;
+        }
+    }
+
+    function validatePerihelion() {
+        perihelion_point = document.getElementById('perihelion_point');
+        if (!isNaN(perihelion_point.value)) {
+            document.getElementById('perihelion_point_error').classList.remove('unhide_div');
+            document.getElementById('perihelion_point_validated').classList.add('unhide_div');
+            return true;
+        } else {
+            document.getElementById('perihelion_point_error').classList.add('unhide_div');
+            document.getElementById('perihelion_point_validated').classList.remove('unhide_div');
+            return false;
+        }
+    }
+
+    function validateAbsoluteMagnitude(){
+        absolute_magnitude = document.getElementById('absolute_magnitude');
+        if (!isNaN(absolute_magnitude.value)) {
+            document.getElementById('absolute_magnitude_error').classList.remove('unhide_div');
+            document.getElementById('absolute_magnitude_validated').classList.add('unhide_div');
+            return true;
+        } else {
+            document.getElementById('absolute_magnitude_error').classList.add('unhide_div');
+            document.getElementById('absolute_magnitude_validated').classList.remove('unhide_div');
+            return false;
+        } 
+    }
+
+    function validateSemiMajorAxis(){
+        semi_major_axis = document.getElementById('semi_major_axis');
+        if (!isNaN(semi_major_axis.value)) {
+            document.getElementById('semi_major_axis_error').classList.remove('unhide_div');
+            document.getElementById('semi_major_axis_validated').classList.add('unhide_div');
+            return true;
+        } else {
+            document.getElementById('semi_major_axis_error').classList.add('unhide_div');
+            document.getElementById('semi_major_axis_validated').classList.remove('unhide_div');
+            return false;
+        } 
+    }
+
+    function validateMeanMotion(){
+        mean_motion = document.getElementById('mean_motion');
+        if (!isNaN(mean_motion.value)) {
+            document.getElementById('mean_motion_error').classList.remove('unhide_div');
+            document.getElementById('mean_motion_validated').classList.add('unhide_div');
+            return true;
+        } else {
+            document.getElementById('mean_motion_error').classList.add('unhide_div');
+            document.getElementById('mean_motion_validated').classList.remove('unhide_div');
+            return false;
+        } 
+    }
+
+    function submitDatasetForm() {
+        if (validateDatasetFile()) {
+            document.getElementById('input-form').classList.add('hide_div');
+            document.getElementById("loader").classList.remove('hide_div');
+        } else {
+            return false;
+        }
+    }
+
+    function submitSingleForm() {
+        if ((validatePerihelion() && validateAbsoluteMagnitude() && validateSemiMajorAxis() && validateMeanMotion())) {
+            document.getElementById('input-form').classList.add('hide_div');
+            document.getElementById("loader").classList.remove('hide_div');
+        } else {
+            return false;
+        }
+    }
+
+    function changeForm(src) {
+        if (src.value == "csv") {
+            document.getElementById('input-csv-form').classList.remove('hide_div');
+            document.getElementById('input-single-form').classList.add('hide_div');
+        } else {
+            document.getElementById('input-csv-form').classList.add('hide_div');
+            document.getElementById('input-single-form').classList.remove('hide_div');
+        }
+
+    }
+</script>
+{% endblock head %}
+
+
+{% block content %}
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Are the Asteroids Potentially hazardous or not?</h1>
+        <p>Welcome to our celestial journey into the heart of space exploration! At our website, we delve deep into the mysteries of the cosmos, focusing on a crucial aspect of celestial dynamics: the prediction of Minimal Orbital Intersection Distance (MOID). Our mission is to assess the potential risks of collisions between asteroids and other astronomical objects with unparalleled precision</p>
+        <p>Through cutting-edge computational models and meticulous analysis of orbital data, we offer insights into the intricate dance of celestial bodies and the potential for close encounters. Our goal is to provide valuable information to astronomers, space agencies, and enthusiasts alike, empowering them to understand and mitigate the risks posed by cosmic collisions</p>
+        <img class="ui left floated big image" src="{% static 'images/neo_asteroids.jpeg' %}" alt="classification graph">
+        
+        <p>Eccentricity: Unraveling Orbital Shapes
+
+            Eccentricity, the measure of an asteroid's orbit elongation, plays a pivotal role in assessing its hazard potential. From perfectly circular to highly elongated orbits, eccentricity determines the asteroid's speed fluctuations as it approaches Earth. Higher eccentricities translate to greater unpredictability and increased risk of close encounters or impacts.</p>
+        <br/>
+        <p>Absolute Magnitude: Shedding Light on Size and Impact Energy
+
+            Absolute magnitude serves as our beacon in understanding asteroid size and impact energy. Brightness observed from a standard distance reveals an asteroid's absolute magnitude, reflecting its size and potential damage upon impact. Larger asteroids with brighter magnitudes pose greater threats, driving our vigilance in monitoring their trajectories.</p>
+            <br/>
+        <p>Mean Motion: Deciphering Orbital Periods
+
+            Mean motion, the average angular speed of an asteroid's orbit, unveils its orbital period and encounter frequency with Earth.</p>
+        <br/></div>
+    <div class="ui raised very padded  container segment description">
+        <h1 class="ui header">Input Data</h1>
+        <div id="loader" class="d-flex justify-content-center hide_div">
+            <div class="spinner-grow text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-secondary" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-success" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-danger" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-warning" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-info" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-light" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+            <div class="spinner-grow text-dark" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+       <div id="input-form">
+            <div class="d-flex justify-content-center">
+                <div class="form-check form-check-inline input-selecters">
+                    <input id="csv-checkbox" class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="csv" checked onchange="changeForm(this)">
+                    <label class="form-check-label" for="inlineRadio1">Input a csv file</label>
+                </div>
+                <div class="form-check form-check-inline input-selecters">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="single" onchange="changeForm(this)">
+                    <label class="form-check-label" for="inlineRadio2">Input values individually</label>
+                </div>
+            </div>
+            <br />
+            <form id="input-csv-form" class="needs-validation input" method="post" enctype="multipart/form-data" onsubmit="return submitDatasetForm()">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input class="form-control form-control-sm" id="form_type" name="form_type" type="text" value="csv" hidden>
+                    <label for="dataset_file" class="form-label">Upload File</label>
+                    <input class="form-control form-control-sm" id="dataset_file" name="dataset_file" type="file" onchange="validateDatasetFile()" value="">
+                    <div id="file_type_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="file_type_error" class="invalid-feedback" >
+                        **Must be an excel file
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Submit form</button>
+                </div>
+            </form>
+            <form id="input-single-form" class="needs-validation input hide_div" method="post" enctype="multipart/form-data" onsubmit="return submitSingleForm()">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input class="form-control form-control-sm" id="form_type" name="form_type" type="text" value="single" hidden>
+                    <label for="absolute_magnitude" class="form-label">Absolute Magnitude</label>
+                    <input class="form-control form-control-sm" id="absolute_magnitude" name="absolute_magnitude" type="text" value="" required onchange="validateAbsoluteMagnitude()">
+                    <div id="absolute_magnitude_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="absolute_magnitude_error" class="invalid-feedback" >
+                        Wrong Input
+                    </div>
+                    <br />
+                    <label for="semi_major_axis" class="form-label">Semi Major Axis</label>
+                    <input class="form-control form-control-sm" id="semi_major_axis" name="semi_major_axis" type="text" value="" required onchange="validateSemiMajorAxis()">
+                    <div id="semi_major_axis_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="semi_major_axis_error" class="invalid-feedback" >
+                        Wrong Input
+                    </div>
+                    <br />
+                    <label for="perihelion_point" class="form-label">Perihelion Point</label>
+                    <input class="form-control form-control-sm" id="perihelion_point" name="perihelion_point" type="text" value="" required onchange="validatePerihelion()">
+                    <div id="perihelion_point_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="perihelion_point_error" class="invalid-feedback" >
+                        Wrong Input
+                    </div>
+                    <br />
+                    <label for="mean_motion" class="form-label">Mean Motion</label>
+                    <input class="form-control form-control-sm" id="mean_motion" name="mean_motion" type="text" value="" required onchange="validateMeanMotion()">
+                    <div id="mean_motion_validated" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div id="mean_motion_error" class="invalid-feedback" >
+                        Wrong Input
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">Submit form</button>
+                </div>
+            </form>
+    </div>
+    </div>
+{% endblock content%}
